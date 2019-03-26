@@ -1,6 +1,7 @@
 import React from "react";
 import { StyleSheet, Text, View, Button, AppRegistry } from "react-native";
 import Voice from "react-native-voice";
+import Speech from "react-native-speech";
 export default class VoiceNative extends React.Component {
   constructor(props) {
     super(props);
@@ -17,6 +18,32 @@ export default class VoiceNative extends React.Component {
 
   componentWillUnmount() {
     Voice.destroy().then(Voice.removeAllListeners);
+  }
+
+  _startHandler() {
+    const now = new Date();
+    Speech.speak({
+      text: `Il est ${now.getHours()} heures et ${now.getMinutes()} minutes`,
+      voice: "fr-FR"
+    })
+      .then(started => {
+        console.log("Speech started");
+      })
+      .catch(error => {
+        console.log("You've already started a speech instance.");
+      });
+  }
+
+  _pauseHandler() {
+    Speech.pause();
+  }
+
+  _resumeHandler() {
+    Speech.resume();
+  }
+
+  _stopHandler() {
+    Speech.stop();
   }
 
   onSpeechStart = e => {
@@ -39,6 +66,10 @@ export default class VoiceNative extends React.Component {
     this.setState({
       results: e.value
     });
+    console.warn(e.value);
+    if (e.value[0].includes("heure")) {
+      this._startHandler();
+    }
   };
 
   _startRecognition = async e => {
@@ -48,7 +79,7 @@ export default class VoiceNative extends React.Component {
       results: []
     });
     try {
-      await Voice.start("fr-FR");
+      await Voice.start("es-ES");
     } catch (e) {
       console.error(e);
     }
